@@ -1,0 +1,57 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        Int      @id @default(autoincrement())
+  email     String   @unique
+  password  String
+  name      String
+  role      String   @default("STUDENT")
+  createdAt DateTime @default(now())
+
+  jobs         Job[]
+  applications Application[]
+}
+
+model Job {
+  id          Int      @id @default(autoincrement())
+  title       String
+  description String
+  location    String
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+
+  companyId Int
+  company   User @relation(fields: [companyId], references: [id])
+
+  applications   Application[]
+  matchingScores MatchingScore[]
+}
+
+model Application {
+  id        Int      @id @default(autoincrement())
+  status    String   @default("PENDING")
+  appliedAt DateTime @default(now())
+
+  userId Int
+  user   User @relation(fields: [userId], references: [id])
+
+  jobId Int
+  job   Job  @relation(fields: [jobId], references: [id])
+}
+
+model MatchingScore {
+  id        Int      @id @default(autoincrement())
+  score     Float
+  createdAt DateTime @default(now())
+
+  userId Int
+  jobId  Int
+  job    Job @relation(fields: [jobId], references: [id])
+}
