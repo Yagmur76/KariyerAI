@@ -18,7 +18,7 @@ function Login() {
       return
     }
     setHata('')
-    alert('Giriş başarılı!')
+       navigate('/dashboard')
   }
 
   return (
