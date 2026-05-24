@@ -60,18 +60,41 @@ router.post(
   }
 );
 
-router.get('/:id', async (req, res) => {
+router.get('/', async (req, res) => {
 
-  const job = await prisma.job.findUnique({
-    where: {
-      id: parseInt(req.params.id)
-    }
-  });
+const jobs = await prisma.job.findMany({
+include: {
+company: true,
+applications: true
+}
+});
 
-  res.json(job);
+res.json(jobs);
 
 });
 
+/**
+ * @swagger
+ * /api/jobs/{id}:
+ *   put:
+ *     summary: İlan güncelle
+ *     tags: [Jobs]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *     responses:
+ *       200:
+ *         description: İlan güncellendi
+ */
 router.put(
   '/:id',
   authMiddleware,
@@ -99,7 +122,22 @@ router.put(
 
   }
 );
-
+/**
+ * @swagger
+ * /api/jobs/{id}:
+ *   delete:
+ *     summary: İlan sil
+ *     tags: [Jobs]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *     responses:
+ *       200:
+ *         description: İlan silindi
+ */
 router.delete(
   '/:id',
   authMiddleware,

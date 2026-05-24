@@ -17,6 +17,7 @@ model User {
 
   jobs         Job[]
   applications Application[]
+  matchingScores MatchingScore[]
 }
 
 model Job {
@@ -47,11 +48,13 @@ model Application {
 }
 
 model MatchingScore {
-  id        Int      @id @default(autoincrement())
-  score     Float
-  createdAt DateTime @default(now())
+id        Int      @id @default(autoincrement())
+score     Float
+createdAt DateTime @default(now())
 
-  userId Int
-  jobId  Int
-  job    Job @relation(fields: [jobId], references: [id])
+userId Int
+user   User @relation(fields: [userId], references: [id])
+
+jobId Int
+job   Job @relation(fields: [jobId], references: [id])
 }
