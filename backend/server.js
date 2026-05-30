@@ -14,6 +14,9 @@ app.get("/", (req, res) => {
 const applicationRoutes = require("./src/routes/applicationRoutes");
 app.use("/api/applications", applicationRoutes);
 
+const aiRoutes = require("./src/routes/aiRoutes");
+app.use("/api/ai", aiRoutes);
+
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`Server ${PORT} portunda çalışıyor...`);
