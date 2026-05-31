@@ -5,6 +5,7 @@ import Dashboard from './pages/Dashboard'
 import Jobs from './pages/Jobs'
 import Profile from './pages/Profile'
 import CVUpload from './pages/CVUpload'
+import Applications from './pages/Applications'
 
 function App() {
   return (
@@ -15,6 +16,8 @@ function App() {
       <Route path="/jobs" element={<Jobs />} />
       <Route path="/profile" element={<Profile />} />
       <Route path="/cv-upload" element={<CVUpload />} />
+      <Route path="/applications" element={<Applications />} />
+
     </Routes>
   )
 }

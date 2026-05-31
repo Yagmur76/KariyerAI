@@ -44,10 +44,10 @@ function Dashboard() {
             <div className={styles.cardValue}>Görüntüle</div>
           </div>
 
-          <div className={styles.card}>
-            <div className={styles.cardIcon}>🔔</div>
-            <div className={styles.cardTitle}>Bildirimler</div>
-            <div className={styles.cardValue}>0</div>
+          <div className={styles.card} onClick={() => navigate('/applications')} style={{cursor:'pointer'}}>
+            <div className={styles.cardIcon}>📋</div>
+            <div className={styles.cardTitle}>Başvurularım</div>
+            <div className={styles.cardValue}>3 başvuru</div>
           </div>
         </div>
       </div>
