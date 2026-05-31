@@ -1,0 +1,45 @@
+# docker-compose.yml
+version: "3.9"
+
+services:
+
+  # PostgreSQL veritabanı (Suzan)
+  db:
+    image: postgres:15
+    environment:
+      POSTGRES_USER: kariyerai
+      POSTGRES_PASSWORD: kariyerai123
+      POSTGRES_DB: kariyerai_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  # Node.js Backend (Betül, Suzan, Yağmur)
+  backend:
+    build: ./backend
+    ports:
+      - "5000:5000"
+    environment:
+      - DATABASE_URL=postgres://kariyerai:kariyerai123@db:5432/kariyerai_db
+      - AI_SERVICE_URL=http://ai-service:8000
+    depends_on:
+      - db
+
+  # Python AI Service (Nurhan)
+  ai-service:
+    build: ./ai-service
+    ports:
+      - "8000:8000"
+
+  # Frontend Arayüzü (Helin, Nurhan)
+  frontend:
+    build: ./frontend
+    ports:
+      - "5173:5173"
+    depends_on:
+      - backend
+      - ai-service
+
+volumes:
+  postgres_data:
