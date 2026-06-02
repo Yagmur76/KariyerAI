@@ -1,9 +1,15 @@
-// frontend/src/components/MatchCard.jsx
-
 import SkillCard from "./SkillCard";
 
-function MatchCard({ company, position, matchScore, missingSkills, matchedSkills }) {
-  // Skor rengini belirle
+// Gelen değişkenleri (props) kendi API çıktımıza uyduruyoruz
+function MatchCard({ score, status }) {
+  
+  // Helin'in yazdığı değişkenlerin hata vermemesi için eşleştirme yapıyoruz
+  const matchScore = score || 0; 
+  const company = "KariyerAI Analizi";
+  const position = "Eşleşme Durumu";
+  const matchedSkills = []; 
+
+  // Skor rengini belirle (Helin'in orijinal mantığı)
   const scoreColor =
     matchScore >= 80 ? "#065F46" :
     matchScore >= 60 ? "#92400E" : "#991B1B";
@@ -19,7 +25,7 @@ function MatchCard({ company, position, matchScore, missingSkills, matchedSkills
         borderRadius: "12px",
         padding: "20px",
         marginBottom: "16px",
-        backgroundColor: "#fff",
+        backgroundColor: "#FFF",
         boxShadow: "0 1px 4px rgba(0,0,0,0.06)",
       }}
     >
@@ -29,7 +35,8 @@ function MatchCard({ company, position, matchScore, missingSkills, matchedSkills
           <h3 style={{ margin: 0, fontSize: "16px", fontWeight: 600 }}>{position}</h3>
           <p style={{ margin: "4px 0 0", color: "#6B7280", fontSize: "14px" }}>{company}</p>
         </div>
-        {/* Skor */}
+        
+        {/* Skor Alanı */}
         <div
           style={{
             backgroundColor: scoreBg,
@@ -44,23 +51,9 @@ function MatchCard({ company, position, matchScore, missingSkills, matchedSkills
         </div>
       </div>
 
-      {/* Eşleşen beceriler */}
-      <div style={{ marginTop: "16px" }}>
-        <p style={{ fontSize: "12px", color: "#6B7280", marginBottom: "6px" }}>Eşleşen beceriler:</p>
-        {matchedSkills.map((skill) => (
-          <SkillCard key={skill} skill={skill} isMissing={false} />
-        ))}
+      <div style={{ marginTop: "12px", fontSize: "14px", color: "#4B5563" }}>
+        <strong>Sistem Mesaji:</strong> {status === "success" ? "Yapay zeka analizi başariyla tamamlandi." : status}
       </div>
-
-      {/* Eksik beceriler */}
-      {missingSkills.length > 0 && (
-        <div style={{ marginTop: "12px" }}>
-          <p style={{ fontSize: "12px", color: "#6B7280", marginBottom: "6px" }}>Eksik beceriler:</p>
-          {missingSkills.map((skill) => (
-            <SkillCard key={skill} skill={skill} isMissing={true} />
-          ))}
-        </div>
-      )}
     </div>
   );
 }

@@ -4,6 +4,11 @@ from pydantic import BaseModel
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
 
+import spacy
+
+# İndirdiğimiz İngilizce dil modelini hafızaya yüklüyoruz
+nlp = spacy.load("en_core_web_sm")
+
 app = FastAPI()
 
 # Frontend'in (React) senin bu servisine erişebilmesi için gerekli izin ayarı (CORS)
@@ -15,34 +20,56 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+
+# --- MODEL TANIMLAMALARI ---
+
 class MatchRequest(BaseModel):
     cv_text: str
     job_text: str
 
+class AnalyzeRequest(BaseModel):
+    cv_text: str
+
+
+# --- ENDPOINT'LER ---
+
 @app.post("/api/ai/match")
 async def match_cv(request: MatchRequest):
-    # TF-IDF ile eşleşme skoru hesapla
-    vectorizer = TfidfVectorizer()
-    matrix = vectorizer.fit_transform([request.cv_text, request.job_text])
-    score = cosine_similarity(matrix[0:1], matrix[1:2])
-    match_percentage = round(float(score[0][0]) * 100, 2)
-
-    # CV'deki ve ilândaki kelimeleri bul
     cv_words = set(request.cv_text.lower().split())
     job_words = set(request.job_text.lower().split())
-
-    # İlanda olup CV'de olmayan kelimeler = eksik beceriler
-    missing = job_words - cv_words - cv_words
-
-    # İlanda olup CV'de olmayan kelimeler = eksik beceriler
+    
+    if not cv_words or not job_words:
+        return {"match_score": 0, "missing_skills": [], "status": "Düşük Eşleşme"}
+        
+    vectorizer = TfidfVectorizer()
+    tfidf_matrix = vectorizer.fit_transform([request.cv_text, request.job_text])
+    match_percentage = int(cosine_similarity(tfidf_matrix[0:1], tfidf_matrix[1:2])[0][0] * 100)
+    
     missing = job_words - cv_words
-
-    # Anlamsız kısa kelimeleri (Stop Words) filtrele
     stop_words = {"for", "and", "with", "the", "a", "an", "or", "in", "of", "to", "we", "at", "looking", "skills"}
     missing = missing - stop_words
-
+    
     return {
         "match_score": match_percentage,
-        "missing_skills": list(missing)[:5],  # En fazla 5 tane göster
+        "missing_skills": list(missing)[:5],
         "status": "Yüksek Eşleşme" if match_percentage >= 70 else "Orta Eşleşme" if match_percentage >= 40 else "Düşük Eşleşme"
+    }
+
+
+@app.post("/api/ai/analyze-cv")
+async def analyze_cv(request: AnalyzeRequest):
+    doc = nlp(request.cv_text.lower())
+    
+    skill_pool = {"python", "fastapi", "react", "sql", "docker", "javascript", "node.js", "git", "html", "css"}
+    extracted_skills = []
+    
+    for token in doc:
+        if token.text in skill_pool:
+            extracted_skills.append(token.text)
+            
+    unique_skills = list(set(extracted_skills))
+    
+    return {
+        "skills": unique_skills,
+        "total_skills_found": len(unique_skills)
     }
