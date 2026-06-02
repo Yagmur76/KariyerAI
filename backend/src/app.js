@@ -8,6 +8,7 @@ const authRoutes = require('./routes/authRoutes');
 const adminRoutes = require('./routes/adminRoutes');
 const swaggerUi = require('swagger-ui-express');
 const swaggerSpec = require('./swagger');
+const matchRoutes = require('./routes/matchRoutes');
 
 app.use(express.json());
 
@@ -16,7 +17,7 @@ app.use('/api/jobs', jobRoutes);
 app.use('/api/auth', authRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/applications', applicationRoutes);
-
+app.use('/api/match', matchRoutes);
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
 app.get('/', (req, res) => {

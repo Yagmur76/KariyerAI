@@ -24,13 +24,29 @@ router.get('/', async (req, res) => {
   res.json(jobs);
 
 });
-
 /**
  * @swagger
  * /api/jobs:
  *   post:
  *     summary: Yeni ilan oluştur
  *     tags: [Jobs]
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               title:
+ *                 type: string
+ *               description:
+ *                 type: string
+ *               location:
+ *                 type: string
+ *               companyId:
+ *                 type: integer
  *     responses:
  *       200:
  *         description: İlan oluşturuldu

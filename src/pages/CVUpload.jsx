@@ -1,3 +1,4 @@
+import axios from 'axios'
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import styles from './CVUpload.module.css'
@@ -17,13 +18,25 @@ function CVUpload() {
     }
   }
 
-  const handleYukle = () => {
+  const handleYukle = async () => {
     if (!dosya) return
     setYukleniyor(true)
-    setTimeout(() => {
+
+    try {
+      const formData = new FormData()
+      formData.append('file', dosya)
+
+      const response = await axios.post('http://localhost:8000/parse-cv', formData, {
+        headers: { 'Content-Type': 'multipart/form-data' }
+      })
+
+      console.log('CV metni:', response.data.metin)
       setYukleniyor(false)
       setYuklendi(true)
-    }, 2000)
+    } catch (err) {
+      setYukleniyor(false)
+      alert('CV yüklenirken hata oluştu!')
+    }
   }
 
   const formatBoyut = (bytes) => {
