@@ -64,12 +64,7 @@ async def analyze_cv(request: AnalyzeRequest):
     extracted_skills = []
     
     for token in doc:
-        if token.text in skill_pool:
-            extracted_skills.append(token.text)
-            
-    unique_skills = list(set(extracted_skills))
-    
-    return {
-        "skills": unique_skills,
-        "total_skills_found": len(unique_skills)
-    }
+        # Kelimenin küçük harf halini alıp havuzda arıyoruz
+        clean_token = token.text.lower().strip()
+        if clean_token in skill_pool:
+            extracted_skills.append(clean_token)
