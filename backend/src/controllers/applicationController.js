@@ -55,7 +55,17 @@ exports.filterCandidates = async (req, res) => {
     if (status) where.status = status;
     const results = await prisma.application.findMany({
       where,
-      include: { user: true, job: true }
+      include: {
+        user: {
+          select: {
+            id: true,
+            email: true,
+            name: true,
+            role: true
+          }
+        },
+        job: true
+      }
     });
     res.json({ message: "Adaylar filtrelendi!", total: results.length, data: results });
   } catch (err) {
