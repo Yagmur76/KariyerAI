@@ -1,10 +1,11 @@
 const express = require("express");
 const router = express.Router();
 const { applyToJob, getMyApplications, updateStatus, filterCandidates } = require("../controllers/applicationController");
+const authenticate = require("../middlewares/authMiddleware");
 
-router.post("/", applyToJob);
-router.get("/user/:userId", getMyApplications);
-router.put("/:id/status", updateStatus);
-router.get("/filter", filterCandidates);
+router.post("/", authenticate, applyToJob);
+router.get("/user/:userId", authenticate, getMyApplications);
+router.put("/:id/status", authenticate, updateStatus);
+router.get("/filter", authenticate, filterCandidates);
 
 module.exports = router;
