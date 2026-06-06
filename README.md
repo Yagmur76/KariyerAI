@@ -1,0 +1,2 @@
+# KariyerAI
+Kariyer AI Projesi
