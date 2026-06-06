@@ -1,27 +1,4 @@
 {
-<<<<<<< HEAD
-  "name": "kariyerai-backend",
-  "version": "1.0.0",
-  "description": "KariyerAI Backend - Betul Auth modulu",
-  "main": "server.js",
-  "scripts": {
-    "start": "node server.js",
-    "dev": "nodemon server.js",
-    "db:generate": "prisma generate",
-    "db:migrate": "prisma migrate dev",
-    "db:studio": "prisma studio"
-  },
-  "license": "ISC",
-  "type": "commonjs",
-  "dependencies": {
-    "@prisma/client": "^6.19.0",
-    "axios": "^1.9.0",
-    "bcryptjs": "^3.0.2",
-    "cors": "^2.8.6",
-    "dotenv": "^17.4.2",
-    "express": "^5.2.1",
-    "jsonwebtoken": "^9.0.2",
-=======
   "name": "backend",
   "version": "1.0.0",
   "description": "",
@@ -42,18 +19,12 @@
     "cors": "^2.8.6",
     "dotenv": "^17.4.2",
     "express": "^5.2.1",
->>>>>>> origin/main
     "swagger-jsdoc": "^6.3.0",
     "swagger-ui-express": "^5.0.1"
   },
   "devDependencies": {
-<<<<<<< HEAD
-    "nodemon": "^3.1.14",
-    "prisma": "^6.19.0"
-=======
     "@prisma/client": "^5.22.0",
     "nodemon": "^3.1.14",
     "prisma": "^5.22.0"
->>>>>>> origin/main
   }
 }
