@@ -35,6 +35,9 @@ app.use("/api/ai", aiRoutes);
 const jobRoutes = require("./src/routes/jobRoutes");
 app.use("/api/jobs", jobRoutes);
 
+const adminRoutes = require("./src/routes/adminRoutes");
+app.use("/api/admin", adminRoutes);
+
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log("Server " + PORT + " portunda calisiyor...");
