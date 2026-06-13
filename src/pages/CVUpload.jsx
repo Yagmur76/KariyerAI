@@ -7,23 +7,46 @@ function CVUpload() {
   const [dosya, setDosya] = useState(null)
   const [yukleniyor, setYukleniyor] = useState(false)
   const [yuklendi, setYuklendi] = useState(false)
+  const [analiz, setAnaliz] = useState(null)
+  const [hata, setHata] = useState('')
 
   const handleDosyaSec = (e) => {
     const secilen = e.target.files[0]
     if (secilen && secilen.type === 'application/pdf') {
       setDosya(secilen)
+      setHata('')
     } else {
       alert('Sadece PDF dosyası yükleyebilirsiniz!')
     }
   }
 
-  const handleYukle = () => {
+  const handleYukle = async () => {
     if (!dosya) return
     setYukleniyor(true)
-    setTimeout(() => {
+    setHata('')
+
+    try {
+      const formData = new FormData()
+      formData.append('dosya', dosya)
+
+      const response = await fetch('http://localhost:8000/api/cv/analiz', {
+        method: 'POST',
+        body: formData
+      })
+
+      const data = await response.json()
+
+      if (response.ok) {
+        setAnaliz(data)
+        setYuklendi(true)
+      } else {
+        setHata('Analiz yapılamadı!')
+      }
+    } catch {
+      setHata('AI servisine bağlanılamadı!')
+    } finally {
       setYukleniyor(false)
-      setYuklendi(true)
-    }, 2000)
+    }
   }
 
   const formatBoyut = (bytes) => {
@@ -74,21 +97,68 @@ function CVUpload() {
               </div>
             )}
 
+            {hata && <p style={{color:'red', marginTop:'8px'}}>{hata}</p>}
+
             <button
               className={styles.uploadBtn}
               onClick={handleYukle}
               disabled={!dosya || yukleniyor}
             >
-              {yukleniyor ? '⏳ Yükleniyor...' : 'CV Yükle ve Analiz Et'}
+              {yukleniyor ? '⏳ AI Analiz ediyor...' : 'CV Yükle ve Analiz Et'}
             </button>
           </div>
         ) : (
           <div className={styles.successCard}>
             <div className={styles.successIcon}>✅</div>
-            <div className={styles.successText}>CV başarıyla yüklendi!</div>
-            <div className={styles.successSubtext}>
-              AI analiziniz hazırlanıyor...
-            </div>
+            <div className={styles.successText}>CV başarıyla analiz edildi!</div>
+
+            {analiz && (
+              <div style={{marginTop: '1.5rem', textAlign: 'left', width: '100%'}}>
+                <div style={{marginBottom: '1rem'}}>
+                  <strong>🎯 Eşleşme Skoru: %{analiz.eslesme_skoru}</strong>
+                  <div style={{background: '#e0e7ff', borderRadius: '8px', height: '12px', marginTop: '8px'}}>
+                    <div style={{
+                      background: '#4f46e5',
+                      width: `${analiz.eslesme_skoru}%`,
+                      height: '100%',
+                      borderRadius: '8px'
+                    }}/>
+                  </div>
+                </div>
+
+                <div style={{marginBottom: '1rem'}}>
+                  <strong>💡 Tespit Edilen Beceriler:</strong>
+                  <div style={{display: 'flex', flexWrap: 'wrap', gap: '8px', marginTop: '8px'}}>
+                    {analiz.beceriler.length > 0 ? analiz.beceriler.map(b => (
+                      <span key={b} style={{
+                        background: '#e0e7ff', color: '#4f46e5',
+                        padding: '4px 12px', borderRadius: '20px', fontSize: '14px'
+                      }}>{b}</span>
+                    )) : <span style={{color:'#888'}}>Beceri tespit edilemedi</span>}
+                  </div>
+                </div>
+
+                <div>
+                  <strong>⚠️ Eksik Beceriler:</strong>
+                  <div style={{display: 'flex', flexWrap: 'wrap', gap: '8px', marginTop: '8px'}}>
+                    {analiz.eksik_beceriler.map(b => (
+                      <span key={b} style={{
+                        background: '#fee2e2', color: '#dc2626',
+                        padding: '4px 12px', borderRadius: '20px', fontSize: '14px'
+                      }}>{b}</span>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            )}
+
+            <button
+              className={styles.uploadBtn}
+              onClick={() => { setYuklendi(false); setDosya(null); setAnaliz(null) }}
+              style={{marginTop: '1.5rem', marginRight: '1rem', background: '#6b7280'}}
+            >
+              Yeni CV Yükle
+            </button>
             <button
               className={styles.uploadBtn}
               onClick={() => navigate('/dashboard')}
