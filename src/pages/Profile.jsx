@@ -4,12 +4,12 @@ import styles from './Profile.module.css'
 
 function Profile() {
   const navigate = useNavigate()
+  const user = JSON.parse(localStorage.getItem('user') || '{}')
   const [duzenle, setDuzenle] = useState(false)
 
   const [profil, setProfil] = useState({
-    ad: 'Helin',
-    soyad: 'Karakoç',
-    email: 'helinkarakoc67@gmail.com',
+    ad: user.name || '',
+    email: user.email || '',
     universite: 'Üniversite Adı',
     bolum: 'Bilgisayar Mühendisliği',
     sinif: '3'
@@ -46,9 +46,9 @@ function Profile() {
 
         <div className={styles.card}>
           <div className={styles.avatar}>
-            {profil.ad[0]}
+            {profil.ad ? profil.ad[0] : '?'}
           </div>
-          <div className={styles.name}>{profil.ad} {profil.soyad}</div>
+          <div className={styles.name}>{profil.ad}</div>
           <div className={styles.email}>{profil.email}</div>
 
           <label className={styles.label}>Ad</label>
@@ -59,12 +59,12 @@ function Profile() {
             onChange={(e) => setGecici({...gecici, ad: e.target.value})}
           />
 
-          <label className={styles.label}>Soyad</label>
+          <label className={styles.label}>Email</label>
           <input
             className={styles.input}
-            value={duzenle ? gecici.soyad : profil.soyad}
+            value={duzenle ? gecici.email : profil.email}
             disabled={!duzenle}
-            onChange={(e) => setGecici({...gecici, soyad: e.target.value})}
+            onChange={(e) => setGecici({...gecici, email: e.target.value})}
           />
 
           <label className={styles.label}>Üniversite</label>

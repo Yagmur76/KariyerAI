@@ -1,60 +1,47 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import styles from './Jobs.module.css'
 
-const sahteIlanlar = [
-  {
-    id: 1,
-    baslik: 'Frontend Developer',
-    sirket: 'TechCo',
-    ikon: '💻',
-    beceriler: ['React', 'JavaScript', 'CSS']
-  },
-  {
-    id: 2,
-    baslik: 'Backend Developer',
-    sirket: 'StartupX',
-    ikon: '⚙️',
-    beceriler: ['Node.js', 'PostgreSQL', 'REST API']
-  },
-  {
-    id: 3,
-    baslik: 'Full Stack Developer',
-    sirket: 'WebAgency',
-    ikon: '🌐',
-    beceriler: ['React', 'Node.js', 'MongoDB']
-  },
-  {
-    id: 4,
-    baslik: 'DevOps Engineer',
-    sirket: 'CloudCorp',
-    ikon: '🔧',
-    beceriler: ['Docker', 'Kubernetes', 'AWS']
-  },
-  {
-    id: 5,
-    baslik: 'Mobile Developer',
-    sirket: 'AppStudio',
-    ikon: '📱',
-    beceriler: ['React Native', 'JavaScript', 'Firebase']
-  },
-  {
-    id: 6,
-    baslik: 'ML Engineer',
-    sirket: 'AILabs',
-    ikon: '🤖',
-    beceriler: ['Python', 'TensorFlow', 'scikit-learn']
-  }
-]
-
 function Jobs() {
   const [arama, setArama] = useState('')
+  const [ilanlar, setIlanlar] = useState([])
   const navigate = useNavigate()
+  const token = localStorage.getItem('token')
+  const user = JSON.parse(localStorage.getItem('user') || '{}')
 
-  const filtrelenmisIlanlar = sahteIlanlar.filter(ilan =>
-    ilan.baslik.toLowerCase().includes(arama.toLowerCase()) ||
-    ilan.sirket.toLowerCase().includes(arama.toLowerCase()) ||
-    ilan.beceriler.some(b => b.toLowerCase().includes(arama.toLowerCase()))
+  useEffect(() => {
+    fetch('http://localhost:3000/api/jobs', {
+      headers: { Authorization: `Bearer ${token}` }
+    })
+      .then(r => r.json())
+      .then(data => setIlanlar(Array.isArray(data) ? data : []))
+      .catch(() => {})
+  }, [])
+
+  const handleBasvur = async (ilanId) => {
+    try {
+      const response = await fetch('http://localhost:3000/api/applications', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`
+        },
+        body: JSON.stringify({ jobId: ilanId, userId: user.id })
+      })
+      const data = await response.json()
+      if (response.ok) {
+        alert('Başvurunuz alındı!')
+      } else {
+        alert(data.error || 'Başvuru yapılamadı!')
+      }
+    } catch {
+      alert('Sunucuya bağlanılamadı!')
+    }
+  }
+
+  const filtrelenmisIlanlar = ilanlar.filter(ilan =>
+    ilan.title?.toLowerCase().includes(arama.toLowerCase()) ||
+    ilan.location?.toLowerCase().includes(arama.toLowerCase())
   )
 
   return (
@@ -74,7 +61,7 @@ function Jobs() {
 
         <input
           type="text"
-          placeholder="İlan, şirket veya beceri ara..."
+          placeholder="İlan veya konum ara..."
           value={arama}
           onChange={(e) => setArama(e.target.value)}
           className={styles.searchBar}
@@ -87,22 +74,20 @@ function Jobs() {
             {filtrelenmisIlanlar.map(ilan => (
               <div key={ilan.id} className={styles.card}>
                 <div className={styles.cardHeader}>
-                  <span className={styles.companyIcon}>{ilan.ikon}</span>
+                  <span className={styles.companyIcon}>💼</span>
                   <div>
-                    <div className={styles.jobTitle}>{ilan.baslik}</div>
-                    <div className={styles.company}>{ilan.sirket}</div>
+                    <div className={styles.jobTitle}>{ilan.title}</div>
+                    <div className={styles.company}>{ilan.location}</div>
                   </div>
                 </div>
 
                 <div className={styles.tags}>
-                  {ilan.beceriler.map(beceri => (
-                    <span key={beceri} className={styles.tag}>{beceri}</span>
-                  ))}
+                  <span className={styles.tag}>{ilan.description}</span>
                 </div>
 
                 <button
                   className={styles.applyBtn}
-                  onClick={() => alert(`${ilan.baslik} ilanına başvurdunuz!`)}
+                  onClick={() => handleBasvur(ilan.id)}
                 >
                   Başvur
                 </button>
