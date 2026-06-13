@@ -25,7 +25,13 @@ exports.getMyApplications = async (req, res) => {
     const { userId } = req.params;
     const apps = await prisma.application.findMany({
       where: { userId: parseInt(userId) },
-      include: { job: true }
+      include: { 
+  job: {
+    include: {
+      company: true
+    }
+  }
+}
     });
     res.json({ data: apps });
   } catch (err) {

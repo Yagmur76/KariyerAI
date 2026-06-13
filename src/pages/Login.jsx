@@ -8,7 +8,7 @@ function Login() {
   const [hata, setHata] = useState('')
   const navigate = useNavigate()
 
-  const handleLogin = () => {
+  const handleLogin = async () => {
     if (!email || !sifre) {
       setHata('Email ve şifre boş olamaz!')
       return
@@ -18,7 +18,28 @@ function Login() {
       return
     }
     setHata('')
-       navigate('/dashboard')
+
+    try {
+      const response = await fetch('http://localhost:3000/api/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password: sifre })
+      })
+
+      const data = await response.json()
+
+      if (!response.ok) {
+        setHata(data.message || 'Giriş başarısız!')
+        return
+      }
+
+      localStorage.setItem('token', data.token)
+      localStorage.setItem('user', JSON.stringify(data.user))
+
+      navigate('/dashboard')
+    } catch (err) {
+      setHata('Sunucuya bağlanılamadı!')
+    }
   }
 
   return (

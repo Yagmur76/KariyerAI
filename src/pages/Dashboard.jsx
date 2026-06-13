@@ -1,11 +1,38 @@
 import { useNavigate } from 'react-router-dom'
+import { useEffect, useState } from 'react'
 import styles from './Dashboard.module.css'
 
 function Dashboard() {
   const navigate = useNavigate()
+  const user = JSON.parse(localStorage.getItem('user') || '{}')
+  const token = localStorage.getItem('token')
+
+  const [ilanSayisi, setIlanSayisi] = useState(0)
+  const [basvuruSayisi, setBasvuruSayisi] = useState(0)
+
+  useEffect(() => {
+    // İlan sayısını çek
+    fetch('http://localhost:3000/api/jobs', {
+      headers: { Authorization: `Bearer ${token}` }
+    })
+      .then(r => r.json())
+      .then(data => setIlanSayisi(Array.isArray(data) ? data.length : 0))
+      .catch(() => {})
+
+    // Başvuru sayısını çek
+    if (user.id) {
+      fetch(`http://localhost:3000/api/applications/user/${user.id}`, {
+        headers: { Authorization: `Bearer ${token}` }
+      })
+        .then(r => r.json())
+        .then(data => setBasvuruSayisi(data.data ? data.data.length : 0))
+        .catch(() => {})
+    }
+  }, [])
 
   const handleLogout = () => {
-    alert('Çıkış yapıldı!')
+    localStorage.removeItem('token')
+    localStorage.removeItem('user')
     navigate('/login')
   }
 
@@ -14,7 +41,7 @@ function Dashboard() {
       <nav className={styles.navbar}>
         <span className={styles.logo}>KariyerAI</span>
         <div className={styles.navRight}>
-          <span className={styles.username}>Merhaba, Helin 👋</span>
+          <span className={styles.username}>Merhaba, {user.name} 👋</span>
           <button onClick={handleLogout} className={styles.logoutBtn}>
             Çıkış Yap
           </button>
@@ -22,7 +49,7 @@ function Dashboard() {
       </nav>
 
       <div className={styles.content}>
-        <h1 className={styles.welcome}>Hoş geldin, Helin!</h1>
+        <h1 className={styles.welcome}>Hoş geldin, {user.name}!</h1>
         <p className={styles.subtitle}>Kariyer yolculuğuna devam et.</p>
 
         <div className={styles.cards}>
@@ -35,7 +62,7 @@ function Dashboard() {
           <div className={styles.card} onClick={() => navigate('/jobs')} style={{cursor:'pointer'}}>
             <div className={styles.cardIcon}>💼</div>
             <div className={styles.cardTitle}>İş İlanları</div>
-            <div className={styles.cardValue}>6 ilan</div>
+            <div className={styles.cardValue}>{ilanSayisi} ilan</div>
           </div>
 
           <div className={styles.card} onClick={() => navigate('/profile')} style={{cursor:'pointer'}}>
@@ -47,7 +74,7 @@ function Dashboard() {
           <div className={styles.card} onClick={() => navigate('/applications')} style={{cursor:'pointer'}}>
             <div className={styles.cardIcon}>📋</div>
             <div className={styles.cardTitle}>Başvurularım</div>
-            <div className={styles.cardValue}>3 başvuru</div>
+            <div className={styles.cardValue}>{basvuruSayisi} başvuru</div>
           </div>
         </div>
       </div>

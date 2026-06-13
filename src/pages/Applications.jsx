@@ -1,37 +1,29 @@
 import { useNavigate } from 'react-router-dom'
+import { useEffect, useState } from 'react'
 import styles from './Applications.module.css'
-
-const sahteBasvurular = [
-  {
-    id: 1,
-    baslik: 'Frontend Developer',
-    sirket: 'TechCo',
-    tarih: '18 Mayıs 2026',
-    durum: 'beklemede'
-  },
-  {
-    id: 2,
-    baslik: 'Full Stack Developer',
-    sirket: 'WebAgency',
-    tarih: '15 Mayıs 2026',
-    durum: 'kabul'
-  },
-  {
-    id: 3,
-    baslik: 'Backend Developer',
-    sirket: 'StartupX',
-    tarih: '10 Mayıs 2026',
-    durum: 'red'
-  }
-]
 
 function Applications() {
   const navigate = useNavigate()
+  const user = JSON.parse(localStorage.getItem('user') || '{}')
+  const token = localStorage.getItem('token')
+  const [basvurular, setBasvurular] = useState([])
+
+  useEffect(() => {
+    if (user.id) {
+      fetch(`http://localhost:3000/api/applications/user/${user.id}`, {
+        headers: { Authorization: `Bearer ${token}` }
+      })
+        .then(r => r.json())
+        .then(data => setBasvurular(data.data || []))
+        .catch(() => {})
+    }
+  }, [])
 
   const durumBadge = (durum) => {
-    if (durum === 'beklemede') return <span className={`${styles.badge} ${styles.beklemede}`}>⏳ Beklemede</span>
-    if (durum === 'kabul') return <span className={`${styles.badge} ${styles.kabul}`}>✅ Kabul</span>
-    if (durum === 'red') return <span className={`${styles.badge} ${styles.red}`}>❌ Red</span>
+    if (durum === 'PENDING') return <span className={`${styles.badge} ${styles.beklemede}`}>⏳ Beklemede</span>
+    if (durum === 'ACCEPTED') return <span className={`${styles.badge} ${styles.kabul}`}>✅ Kabul</span>
+    if (durum === 'REJECTED') return <span className={`${styles.badge} ${styles.red}`}>❌ Red</span>
+    return <span className={styles.badge}>{durum}</span>
   }
 
   return (
@@ -50,7 +42,7 @@ function Applications() {
         <h1 className={styles.title}>Başvurularım</h1>
         <p className={styles.subtitle}>Yaptığın başvuruları buradan takip edebilirsin.</p>
 
-        {sahteBasvurular.length === 0 ? (
+        {basvurular.length === 0 ? (
           <div className={styles.table}>
             <div className={styles.empty}>
               <div className={styles.emptyIcon}>📭</div>
@@ -65,12 +57,12 @@ function Applications() {
               <span>Tarih</span>
               <span>Durum</span>
             </div>
-            {sahteBasvurular.map(basvuru => (
+            {basvurular.map(basvuru => (
               <div key={basvuru.id} className={styles.tableRow}>
-                <div className={styles.jobTitle}>{basvuru.baslik}</div>
-                <div className={styles.date}>{basvuru.sirket}</div>
-                <div className={styles.date}>{basvuru.tarih}</div>
-                <div>{durumBadge(basvuru.durum)}</div>
+                <div className={styles.jobTitle}>{basvuru.job?.title || '-'}</div>
+                <div className={styles.date}>{basvuru.job?.company?.name || basvuru.job?.companyId || '-'}</div>
+                <div className={styles.date}>{new Date(basvuru.appliedAt).toLocaleDateString('tr-TR')}</div>
+                <div>{durumBadge(basvuru.status)}</div>
               </div>
             ))}
           </div>
