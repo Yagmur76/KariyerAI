@@ -11,7 +11,6 @@ function Dashboard() {
   const [basvuruSayisi, setBasvuruSayisi] = useState(0)
 
   useEffect(() => {
-    // İlan sayısını çek
     fetch('http://localhost:3000/api/jobs', {
       headers: { Authorization: `Bearer ${token}` }
     })
@@ -19,7 +18,6 @@ function Dashboard() {
       .then(data => setIlanSayisi(Array.isArray(data) ? data.length : 0))
       .catch(() => {})
 
-    // Başvuru sayısını çek
     if (user.id) {
       fetch(`http://localhost:3000/api/applications/user/${user.id}`, {
         headers: { Authorization: `Bearer ${token}` }
@@ -53,29 +51,57 @@ function Dashboard() {
         <p className={styles.subtitle}>Kariyer yolculuğuna devam et.</p>
 
         <div className={styles.cards}>
-          <div className={styles.card} onClick={() => navigate('/cv-upload')} style={{cursor:'pointer'}}>
-            <div className={styles.cardIcon}>📄</div>
-            <div className={styles.cardTitle}>CV Durumu</div>
-            <div className={styles.cardValue}>Yükle</div>
-          </div>
+          {user.role === 'STUDENT' && (
+            <>
+              <div className={styles.card} onClick={() => navigate('/cv-upload')} style={{cursor:'pointer'}}>
+                <div className={styles.cardIcon}>📄</div>
+                <div className={styles.cardTitle}>CV Durumu</div>
+                <div className={styles.cardValue}>Yükle</div>
+              </div>
 
-          <div className={styles.card} onClick={() => navigate('/jobs')} style={{cursor:'pointer'}}>
-            <div className={styles.cardIcon}>💼</div>
-            <div className={styles.cardTitle}>İş İlanları</div>
-            <div className={styles.cardValue}>{ilanSayisi} ilan</div>
-          </div>
+              <div className={styles.card} onClick={() => navigate('/jobs')} style={{cursor:'pointer'}}>
+                <div className={styles.cardIcon}>💼</div>
+                <div className={styles.cardTitle}>İş İlanları</div>
+                <div className={styles.cardValue}>{ilanSayisi} ilan</div>
+              </div>
 
-          <div className={styles.card} onClick={() => navigate('/profile')} style={{cursor:'pointer'}}>
-            <div className={styles.cardIcon}>🎯</div>
-            <div className={styles.cardTitle}>Profilim</div>
-            <div className={styles.cardValue}>Görüntüle</div>
-          </div>
+              <div className={styles.card} onClick={() => navigate('/profile')} style={{cursor:'pointer'}}>
+                <div className={styles.cardIcon}>🎯</div>
+                <div className={styles.cardTitle}>Profilim</div>
+                <div className={styles.cardValue}>Görüntüle</div>
+              </div>
 
-          <div className={styles.card} onClick={() => navigate('/applications')} style={{cursor:'pointer'}}>
-            <div className={styles.cardIcon}>📋</div>
-            <div className={styles.cardTitle}>Başvurularım</div>
-            <div className={styles.cardValue}>{basvuruSayisi} başvuru</div>
-          </div>
+              <div className={styles.card} onClick={() => navigate('/applications')} style={{cursor:'pointer'}}>
+                <div className={styles.cardIcon}>📋</div>
+                <div className={styles.cardTitle}>Başvurularım</div>
+                <div className={styles.cardValue}>{basvuruSayisi} başvuru</div>
+              </div>
+            </>
+          )}
+
+          {user.role === 'COMPANY' && (
+            <>
+              <div className={styles.card} onClick={() => navigate('/firma')} style={{cursor:'pointer'}}>
+                <div className={styles.cardIcon}>🏢</div>
+                <div className={styles.cardTitle}>Firma Paneli</div>
+                <div className={styles.cardValue}>İlan Ekle</div>
+              </div>
+
+              <div className={styles.card} onClick={() => navigate('/jobs')} style={{cursor:'pointer'}}>
+                <div className={styles.cardIcon}>💼</div>
+                <div className={styles.cardTitle}>İş İlanları</div>
+                <div className={styles.cardValue}>{ilanSayisi} ilan</div>
+              </div>
+            </>
+          )}
+
+          {user.role === 'ADMIN' && (
+            <div className={styles.card} onClick={() => navigate('/admin')} style={{cursor:'pointer'}}>
+              <div className={styles.cardIcon}>⚙️</div>
+              <div className={styles.cardTitle}>Admin Paneli</div>
+              <div className={styles.cardValue}>Yönet</div>
+            </div>
+          )}
         </div>
       </div>
     </div>
