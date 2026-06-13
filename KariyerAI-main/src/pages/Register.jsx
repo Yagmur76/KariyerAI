@@ -6,11 +6,11 @@ function Register() {
   const [ad, setAd] = useState('')
   const [email, setEmail] = useState('')
   const [sifre, setSifre] = useState('')
-  const [rol, setRol] = useState('ogrenci')
+  const [rol, setRol] = useState('STUDENT')
   const [hata, setHata] = useState('')
   const navigate = useNavigate()
 
-  const handleRegister = () => {
+  const handleRegister = async () => {
     if (!ad || !email || !sifre) {
       setHata('Tüm alanları doldurun!')
       return
@@ -24,8 +24,26 @@ function Register() {
       return
     }
     setHata('')
-    alert('Kayıt başarılı!')
-    navigate('/login')
+
+    try {
+      const response = await fetch('http://localhost:3000/api/auth/register', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name: ad, email, password: sifre, role: rol })
+      })
+
+      const data = await response.json()
+
+      if (!response.ok) {
+        setHata(data.message || 'Kayıt başarısız!')
+        return
+      }
+
+      alert('Kayıt başarılı! Giriş yapabilirsiniz.')
+      navigate('/login')
+    } catch (err) {
+      setHata('Sunucuya bağlanılamadı!')
+    }
   }
 
   return (
@@ -67,25 +85,10 @@ function Register() {
           onChange={(e) => setRol(e.target.value)}
           className={styles.select}
         >
-          <option value="ogrenci">Öğrenci</option>
-          <option value="firma">Firma</option>
+          <option value="STUDENT">Öğrenci</option>
+          <option value="COMPANY">Firma</option>
         </select>
 
         {hata && <div className={styles.error}>{hata}</div>}
 
-        <button onClick={handleRegister} className={styles.button}>
-          Kayıt Ol
-        </button>
-
-        <p className={styles.footer}>
-          Hesabın var mı?{' '}
-          <span onClick={() => navigate('/login')} className={styles.link}>
-            Giriş Yap
-          </span>
-        </p>
-      </div>
-    </div>
-  )
-}
-
-export default Register
+        <button onClick={handleRegister}

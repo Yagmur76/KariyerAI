@@ -6,6 +6,8 @@ import Jobs from './pages/Jobs'
 import Profile from './pages/Profile'
 import CVUpload from './pages/CVUpload'
 import Applications from './pages/Applications'
+import Admin from './pages/Admin'
+import FirmaPanel from './pages/FirmaPanel'
 
 function App() {
   return (
@@ -17,7 +19,8 @@ function App() {
       <Route path="/profile" element={<Profile />} />
       <Route path="/cv-upload" element={<CVUpload />} />
       <Route path="/applications" element={<Applications />} />
-
+      <Route path="/admin" element={<Admin />} />
+      <Route path="/firma" element={<FirmaPanel />} />
     </Routes>
   )
 }
